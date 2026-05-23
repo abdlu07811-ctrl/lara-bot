@@ -1,4 +1,4 @@
-iimport os
+import os
 import telebot
 import random
 from flask import Flask, request

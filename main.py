@@ -67,3 +67,4 @@ def auto_responses(message):
 
 # نظام الويب (Webhooks)
 @server.route('/' + TOKEN
+bot.set_webhook(url='https://web-production-f90f6.up.railway.app/8575847456:AAE0K2YUmc5Ri77kFwrl14IIMV999ewfpeU')

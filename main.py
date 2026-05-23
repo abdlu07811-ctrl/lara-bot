@@ -63,3 +63,4 @@ def webhook():
 if __name__ == "__main__":
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
 
+bot.set_webhook(url='https://web-production-f90f6.up.railway.app/8575847456:AAE0K2YUmc5Ri77kFwrl14IIMV999ewfpeU')

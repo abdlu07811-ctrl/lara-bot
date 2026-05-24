@@ -5,6 +5,9 @@ import re
 from flask import Flask, request
 
 TOKEN = "8575847456:AAE0K2YUmc5Ri77kFwrl14IIMV999ewfpeU"
+# هنا نضع الرابط الخاص بك الذي حصلت عليه من Railway
+WEBHOOK_URL = "https://web-production-aa4e6.up.railway.app/" 
+
 bot = telebot.TeleBot(TOKEN)
 server = Flask(__name__)
 
@@ -12,7 +15,7 @@ server = Flask(__name__)
 GREETING_PARTS_1 = ["يا هلا", "أهلاً", "مرحباً", "نورتنا", "يسعد هالمسا", "تحياتي", "يا مية هلا", "منور"]
 GREETING_PARTS_2 = ["يا غالي", "يا بطل", "يا طيب", "يا مبدع", "يا صديقي", "يا ورد", "بطلنا", "يا عيوني"]
 KIND_WELCOME = ["يا مرحباً بـ {name}، أشرقت الأنوار بوجودك! 🌟", "أهلاً بـ {name}، نورتنا بوجودك اللطيف! ✨", "بكل ود ومحبة، نرحب بـ {name} معنا. 🌸"]
-FLIRT = ["عيونك أجمل من أي كلام.", "أنت شخص مميز جداً.", "وجودك يخلي اليوم أحلى.", "كلامك مثل العسل."]
+FLIRT = ["عيونك أجمل من أي كلام.", "أنت شخص مميز جداً.", "وجودك يخلي اليوم أحلى.", "كلامك مثل الع العسل."]
 JOKES = ["محشش سأل أخوه: إيش الفرق بين الأسبوع والصحراء؟ 😂", "بخيل طاح في البير قال أهم شيء ما تشربون الموية! 💸", "غبي دخل الامتحان قال: هو اسم دلع لواحد اسمه وفاء! 😂"] * 67
 QUOTES = ["النجاح ليس النهاية. 🚀", "كن أنت التغيير. ✨", "الحياة تجربة شجاعة. 💪", "العلم نور. 💡"] * 33
 GAMES = ["حجر ورقة مقص 🪨", "رمي النرد 🎲", "تخمين الرقم 🔢", "لعبة الألغاز 🧠"]
@@ -37,11 +40,10 @@ def welcome_new(message):
 # --- 4. المعالج الرئيسي (مع الحماية) ---
 @bot.message_handler(func=lambda m: True)
 def handle_all(message):
-    text = message.text.lower()
+    text = message.text.lower() if message.text else ""
     chat_id = message.chat.id
     
     # --- نظام الحماية (الفلتر) ---
-    # يمنع الروابط، القنوات، والكلمات السيئة (لا يؤثر على المشرفين)
     if not is_user_admin(message):
         if re.search(r'http[s]?://|t\.me/|www\.|@', text) or any(word in text for word in BAD_WORDS):
             try:
@@ -77,6 +79,14 @@ def getMessage():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode('utf-8'))])
     return "!", 200
 
-if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
+@server.route('/')
+def main_route():
+    return "البوت يعمل بنجاح عبر الـ Webhook!", 200
 
+if __name__ == "__main__":
+    # حذف الـ Webhook القديم وتعيين الرابط الجديد تلقائياً عند التشغيل
+    bot.remove_webhook()
+    bot.set_webhook(url=WEBHOOK_URL + TOKEN)
+    
+    # تشغيل السيرفر
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
